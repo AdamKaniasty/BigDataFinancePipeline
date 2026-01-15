@@ -1,0 +1,233 @@
+name: big-data-project-arm
+
+services:
+
+  # ============================
+  # Zookeeper (ARM64 - for HBase and Kafka)
+  # ============================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    platform: linux/amd64
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - bigdata
+
+  # ============================
+  # Kafka (AMD64 with emulation)
+  # ============================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    platform: linux/amd64
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    networks:
+      - bigdata
+
+  # ============================
+  # HDFS NameNode (ARM64 - Verified)
+  # ============================
+  hdfs-namenode:
+    image: nghia294/hadoop-arm64:v5.0
+    environment:
+      - CLUSTER_NAME=bigdata-cluster
+      - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_namenode_datanode_registration_ip___check=false
+      - HDFS_NAMENODE_USER=root
+      - HDFS_DATANODE_USER=root
+      - HDFS_SECONDARYNAMENODE_USER=root
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    volumes:
+      - namenode:/hadoop/dfs/name
+    networks:
+      - bigdata
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      "
+      export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop &&
+      service ssh start > /dev/null 2>&1 || true &&
+      if [ -f /usr/local/hadoop/etc/hadoop/core-site.xml ]; then
+        sed -i 's|hdfs://namenode:9000|hdfs://hdfs-namenode:9000|g' /usr/local/hadoop/etc/hadoop/core-site.xml &&
+        sed -i 's|hdfs://namenode:9000/|hdfs://hdfs-namenode:9000/|g' /usr/local/hadoop/etc/hadoop/core-site.xml
+      fi &&
+      hdfs namenode -format -force -nonInteractive || true &&
+      exec hdfs namenode
+      "
+
+  # ============================
+  # HDFS DataNode (ARM64 - Verified)
+  # ============================
+  hdfs-datanode:
+    image: nghia294/hadoop-arm64:v5.0
+    depends_on:
+      - hdfs-namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_datanode_data_dir=file:///hadoop/dfs/data
+      - HDFS_NAMENODE_USER=root
+      - HDFS_DATANODE_USER=root
+      - HDFS_SECONDARYNAMENODE_USER=root
+    ports:
+      - "9864:9864"
+    volumes:
+      - datanode:/hadoop/dfs/data
+    networks:
+      - bigdata
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      "
+      export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop &&
+      service ssh start > /dev/null 2>&1 || true &&
+      if [ -f /usr/local/hadoop/etc/hadoop/core-site.xml ]; then
+        sed -i 's|hdfs://namenode:9000|hdfs://hdfs-namenode:9000|g' /usr/local/hadoop/etc/hadoop/core-site.xml &&
+        sed -i 's|hdfs://namenode:9000/|hdfs://hdfs-namenode:9000/|g' /usr/local/hadoop/etc/hadoop/core-site.xml
+      fi &&
+      sleep 10 &&
+      exec hdfs datanode
+      "
+
+  # ============================
+  # Hive Metastore + Server2 (ARM64)
+  # ============================
+  hive-metastore-postgresql:
+    image: bde2020/hive-metastore-postgresql:2.3.0
+    networks:
+      - bigdata
+
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    depends_on:
+      - hdfs-namenode
+      - hdfs-datanode
+      - hive-metastore-postgresql
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
+      - SERVICE_PRECONDITION=hdfs-namenode:9870 hdfs-datanode:9864 hive-metastore-postgresql:5432
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionURL=jdbc:postgresql://hive-metastore-postgresql/metastore
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionDriverName=org.postgresql.Driver
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionUserName=hive
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionPassword=hive
+      - HIVE_SITE_CONF_datanucleus_autoCreateSchema=true
+      - HIVE_SITE_CONF_hive_metastore_warehouse_dir=/user/hive/warehouse
+    command: /opt/hive/bin/hive --service metastore
+    ports:
+      - "9083:9083"
+    networks:
+      - bigdata
+
+  hive:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    depends_on:
+      - hdfs-namenode
+      - hdfs-datanode
+      - hive-metastore
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
+      - SERVICE_PRECONDITION=hive-metastore:9083
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionURL=jdbc:postgresql://hive-metastore-postgresql/metastore
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionDriverName=org.postgresql.Driver
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionUserName=hive
+      - HIVE_SITE_CONF_javax_jdo_option_ConnectionPassword=hive
+      - HIVE_SITE_CONF_hive_metastore_uris=thrift://hive-metastore:9083
+      - HIVE_SITE_CONF_hive_metastore_warehouse_dir=/user/hive/warehouse
+    ports:
+      - "10000:10000"
+    networks:
+      - bigdata
+
+  # ============================
+  # Spark (ARM64)
+  # ============================
+  spark:
+    image: apache/spark:3.5.1
+    environment:
+      SPARK_MODE: local
+    networks:
+      - bigdata
+    volumes:
+      - ./spark:/opt/spark-apps
+    command: ["/bin/bash", "-c", "sleep infinity"]
+
+  # ============================
+  # HBase (AMD64 with emulation)
+  # ============================
+  hbase:
+    image: harisekhon/hbase:latest
+    platform: linux/amd64
+    depends_on:
+      - zookeeper
+      - hdfs-namenode
+    environment:
+      - HBASE_CONF_hbase_rootdir=hdfs://hdfs-namenode:9000/hbase
+      - HBASE_CONF_hbase_cluster_distributed=true
+      - HBASE_CONF_hbase_zookeeper_quorum=zookeeper
+      - HBASE_CONF_hbase_zookeeper_property_clientPort=2181
+    ports:
+      - "16010:16010"   # HBase Web UI
+      - "16020:16020"   # HRegionServer
+    networks:
+      - bigdata
+
+  # ============================
+  # NiFi (ARM64)
+  # ============================
+  nifi:
+    image: apache/nifi:1.27.0
+    environment:
+      NIFI_WEB_HTTP_PORT: 8080
+      SINGLE_USER_CREDENTIALS_USERNAME: admin
+      SINGLE_USER_CREDENTIALS_PASSWORD: admin123
+    ports:
+      - "8080:8080"
+    volumes:
+      - nifi-conf:/opt/nifi/nifi-current/conf
+      - nifi-state:/opt/nifi/nifi-current/state
+      - nifi-database:/opt/nifi/nifi-current/database
+      - nifi-flowfile:/opt/nifi/nifi-current/flowfile_repository
+      - nifi-content:/opt/nifi/nifi-current/content_repository
+      - nifi-provenance:/opt/nifi/nifi-current/provenance_repository
+      - ./nifi/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml:ro
+      - ./nifi/libs/java-websocket.jar:/tmp/java-websocket.jar:ro
+    networks:
+      - bigdata
+    command: >
+      bash -c "
+      if [ -f /tmp/java-websocket.jar ]; then
+        cp -f /tmp/java-websocket.jar /opt/nifi/nifi-current/lib/java-websocket.jar
+      fi &&
+      /opt/nifi/scripts/start.sh
+      "
+
+networks:
+  bigdata:
+    driver: bridge
+
+volumes:
+  namenode:
+  datanode:
+  hive-metastore:
+  nifi-conf:
+  nifi-state:
+  nifi-database:
+  nifi-flowfile:
+  nifi-content:
+  nifi-provenance:
