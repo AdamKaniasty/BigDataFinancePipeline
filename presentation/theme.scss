@@ -1,0 +1,586 @@
+/*-- scss:defaults --*/
+
+// Color Variables
+$bg-primary: #ffffff;
+$bg-secondary: #f8f9fa;
+$bg-tertiary: #f1f3f5;
+$text-primary: #212529;
+$text-secondary: #495057;
+$text-heading: #000000;
+$accent-primary: #0066cc;
+$accent-secondary: #0052a3;
+$accent-tertiary: #f59e0b;
+$code-bg: #f8f9fa;
+$code-border: #e9ecef;
+$border-light: #e9ecef;
+$border-medium: #dee2e6;
+$border-strong: #ced4da;
+$link-hover: #0052a3;
+$success: #28a745;
+$info: #17a2b8;
+$warning: #ffc107;
+$error: #dc3545;
+
+/*-- scss:rules --*/
+
+// ============================================
+// Base Styles
+// ============================================
+.reveal {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: $text-primary;
+  background-color: $bg-primary;
+}
+
+.reveal-viewport {
+  background-color: $bg-primary;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section,
+.reveal .slide {
+  padding: 1.5em 1.5em;
+  max-width: 98%;
+  margin: 0 auto;
+  text-align: left;
+  color: $text-primary;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100vh;
+  height: auto;
+}
+
+
+// ============================================
+// Typography Hierarchy
+// ============================================
+.reveal h1,
+.reveal .slide h1 {
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: $text-heading !important;
+  margin-bottom: 0.6em;
+  margin-top: 0.1em;
+  padding-bottom: 0.3em;
+  border-bottom: 3px solid $accent-primary;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: $accent-tertiary;
+  }
+}
+
+.reveal h2,
+.reveal .slide h2 {
+  font-size: 1.2em;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: $accent-primary !important;
+  margin-bottom: 0.5em;
+  margin-top: 0.3em;
+  padding-left: 0.5em;
+  border-left: 4px solid $accent-primary;
+}
+
+.reveal h3 {
+  font-size: 1.0em;
+  font-weight: 600;
+  line-height: 1.3;
+  color: $text-heading;
+  margin-bottom: 0.8em;
+  margin-top: 0.3em;
+}
+
+.reveal p,
+.reveal .slide p {
+  font-size: 0.65em;
+  line-height: 1.6;
+  margin-bottom: 0.5em;
+  color: $text-primary !important;
+}
+
+.reveal li,
+.reveal .slide li {
+  font-size: 0.65em;
+  line-height: 1.8;
+  margin-bottom: 0.5em;
+  padding-left: 0.3em;
+  position: relative;
+  color: $text-primary !important;
+  display: list-item;
+}
+
+.reveal ol,
+.reveal .slide ol {
+  display: block;
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-left: 0;
+  margin-top: 1.2em;
+  margin-bottom: 0.8em;
+}
+
+.reveal ol > li,
+.reveal .slide ol > li {
+  display: list-item;
+  list-style-position: outside;
+  margin-left: 0;
+  padding-left: 0.5em;
+  margin-bottom: 0.6em;
+}
+
+
+.reveal code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 0.6em;
+  background-color: rgba(0, 102, 204, 0.1);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  color: $text-primary;
+  border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+.reveal pre code {
+  background: transparent;
+  padding: 0;
+  color: $text-primary;
+  font-size: 0.6em;
+  line-height: 1.5;
+  border: none;
+}
+
+// ============================================
+// Blockquotes & Callouts
+// ============================================
+.reveal blockquote {
+  border-left: 4px solid $accent-primary;
+  padding: 1em 1.5em;
+  margin: 1em 0;
+  font-style: italic;
+  background: linear-gradient(to right, rgba(0, 102, 204, 0.05) 0%, transparent 100%);
+  border-radius: 4px;
+  position: relative;
+  
+  &::before {
+    content: '"';
+    position: absolute;
+    left: 0.5em;
+    top: 0.2em;
+    font-size: 2em;
+    color: $accent-primary;
+    opacity: 0.3;
+    font-family: Georgia, serif;
+  }
+}
+
+.reveal blockquote p {
+  margin-bottom: 0.5em;
+  position: relative;
+  z-index: 1;
+}
+
+.reveal blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+// ============================================
+// Images
+// ============================================
+.reveal img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin: 1em 0;
+  border: 1px solid $border-light;
+}
+
+.reveal img + p {
+  font-size: 0.6em;
+  color: $text-secondary;
+  font-style: italic;
+  margin-top: 0.5em;
+  text-align: center;
+}
+
+// ============================================
+// Tables
+// ============================================
+.reveal table {
+  border-collapse: collapse;
+  margin: 0.5em 0;
+  width: 100%;
+  font-size: 0.55em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+
+.reveal table th {
+  background: linear-gradient(to bottom, $accent-primary 0%, $accent-secondary 100%);
+  color: white;
+  border-bottom: 2px solid $accent-secondary;
+  padding: 0.6em 0.8em;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.5px;
+}
+
+.reveal table td {
+  border-bottom: 1px solid $border-light;
+  padding: 0.5em 0.8em;
+  background-color: $bg-primary;
+}
+
+.reveal table tr:last-child td {
+  border-bottom: none;
+}
+
+.reveal table tr:nth-child(even) td {
+  background-color: $bg-secondary;
+}
+
+.reveal table tr:hover td {
+  background-color: rgba(0, 102, 204, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+// ============================================
+// Utility Classes
+// ============================================
+.reveal .centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+
+.reveal .two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5em;
+  align-items: start;
+}
+
+.reveal .columns {
+  display: flex;
+  gap: 1.5em;
+  align-items: flex-start;
+  margin: 0.5em 0;
+}
+
+.reveal .column {
+  flex: 1;
+  padding: 0 0.5em;
+}
+
+.reveal .column[width="50%"] {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+.reveal .highlight {
+  color: $accent-primary;
+  font-weight: 600;
+  background: linear-gradient(to bottom, rgba(0, 102, 204, 0.1) 0%, rgba(0, 102, 204, 0.05) 100%);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+// Card/Box styling
+.reveal .card {
+  background: $bg-primary;
+  border: 1px solid $border-light;
+  border-left: 4px solid $accent-primary;
+  border-radius: 6px;
+  padding: 1.2em 1.5em;
+  margin: 0.8em 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.reveal .card-header {
+  font-weight: 600;
+  color: $accent-primary;
+  margin-bottom: 0.5em;
+  font-size: 0.75em;
+}
+
+.reveal .card-body {
+  font-size: 0.65em;
+  color: $text-primary;
+  line-height: 1.6;
+}
+
+// Section divider
+.reveal .section-divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, $accent-primary, transparent);
+  margin: 1.5em 0;
+  border: none;
+}
+
+// Badge/Tag styling
+.reveal .badge {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  font-size: 0.55em;
+  font-weight: 600;
+  border-radius: 12px;
+  background-color: $accent-primary;
+  color: white;
+  margin: 0 0.2em;
+}
+
+.reveal .badge-secondary {
+  background-color: $text-secondary;
+}
+
+.reveal .badge-success {
+  background-color: $success;
+}
+
+.reveal .badge-info {
+  background-color: $info;
+}
+
+// ============================================
+// Title Slide
+// ============================================
+.reveal .title-slide {
+  text-align: center;
+  padding: 3em 2em;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.reveal .title-slide h1 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+  border: none;
+  padding-bottom: 0;
+  
+  &::after {
+    display: none;
+  }
+}
+
+.reveal .title-slide h2 {
+  font-size: 1em;
+  font-weight: 400;
+  color: $text-secondary;
+  margin-bottom: 1.5em;
+  border: none;
+  padding: 0;
+}
+
+.reveal .title-slide p {
+  font-size: 0.7em;
+  margin-bottom: 0.4em;
+  color: $text-secondary;
+}
+
+// ============================================
+// Progress Bar & Slide Numbers
+// ============================================
+.reveal .progress {
+  color: $accent-primary;
+  height: 4px;
+  background: linear-gradient(to right, $accent-primary, $accent-tertiary);
+}
+
+.reveal .slide-number {
+  background: linear-gradient(135deg, $accent-primary 0%, $accent-secondary 100%);
+  color: #fff;
+  padding: 0.4em 0.8em;
+  border-radius: 20px;
+  font-size: 0.6em;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+// ============================================
+// Strong/Bold Text
+// ============================================
+.reveal strong {
+  font-weight: 600;
+  color: $text-heading;
+}
+
+// ============================================
+// Mermaid Diagrams
+// ============================================
+.reveal .mermaid {
+  background: $bg-secondary;
+  padding: 1em;
+  border-radius: 8px;
+  border: 1px solid $border-light;
+  margin: 1em 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+// ============================================
+// Agenda/List Improvements
+// ============================================
+.reveal .agenda-item {
+  padding: 0.5em 0.8em;
+  margin: 0.3em 0;
+  background: $bg-secondary;
+  border-left: 3px solid $accent-primary;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(0, 102, 204, 0.05);
+    transform: translateX(5px);
+  }
+}
+
+// ============================================
+// Responsive Adjustments
+// ============================================
+@media (max-width: 768px) {
+  .reveal .slides section {
+    padding: 1.5em 1.5em;
+    max-width: 95%;
+  }
+  
+  .reveal h1 {
+    font-size: 1.8em;
+  }
+  
+  .reveal h2 {
+    font-size: 1.3em;
+  }
+  
+  .reveal .two-column {
+    grid-template-columns: 1fr;
+    gap: 1.5em;
+  }
+}
+
+// ============================================
+// Vertical Scrolling Support
+// ============================================
+.reveal .slides section,
+.reveal .slide {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.reveal .slides section::-webkit-scrollbar,
+.reveal .slide::-webkit-scrollbar {
+  width: 10px;
+}
+
+.reveal .slides section::-webkit-scrollbar-track,
+.reveal .slide::-webkit-scrollbar-track {
+  background: $bg-secondary;
+  border-radius: 5px;
+}
+
+.reveal .slides section::-webkit-scrollbar-thumb,
+.reveal .slide::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, $accent-primary, $accent-secondary);
+  border-radius: 5px;
+  border: 2px solid $bg-secondary;
+}
+
+.reveal .slides section::-webkit-scrollbar-thumb:hover,
+.reveal .slide::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, $accent-secondary, $accent-primary);
+}
+
+// ============================================
+// Slide Transitions Enhancement
+// ============================================
+.reveal .slides section {
+  transition: opacity 0.3s ease;
+}
+
+// ============================================
+// Numbered Lists with Better Styling
+// ============================================
+.reveal ol[type="1"],
+.reveal ol:not([type]) {
+  counter-reset: item;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+  
+  > li {
+    counter-increment: item;
+    padding-left: 2.3em;
+    position: relative;
+    margin-bottom: 0.7em;
+    line-height: 1.8;
+    
+    &::before {
+      content: counter(item);
+      position: absolute;
+      left: 0;
+      top: 0.05em;
+      width: 1.6em;
+      height: 1.6em;
+      line-height: 1.6em;
+      text-align: center;
+      background: $accent-primary;
+      color: white;
+      border-radius: 50%;
+      font-weight: 600;
+      font-size: 0.75em;
+      box-shadow: 0 2px 4px rgba(0, 102, 204, 0.3);
+    }
+  }
+}
+
+// ============================================
+// Key Points Highlighting
+// ============================================
+.reveal .key-point {
+  background: linear-gradient(to right, rgba(0, 102, 204, 0.1), transparent);
+  padding: 0.5em 1em;
+  border-left: 4px solid $accent-primary;
+  margin: 0.5em 0;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+// ============================================
+// Code Inline Styling
+// ============================================
+.reveal p code,
+.reveal li code {
+  background: rgba(0, 102, 204, 0.1);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+  border: 1px solid rgba(0, 102, 204, 0.2);
+  color: $accent-secondary;
+  font-weight: 500;
+}

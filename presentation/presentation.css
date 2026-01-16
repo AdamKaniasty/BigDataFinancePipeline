@@ -1,0 +1,173 @@
+/* Minimalist Presentation Styles */
+
+/* ============================================
+   Typography Foundation
+   ============================================ */
+.reveal {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #212529;
+}
+
+.reveal h1 {
+  font-weight: 700;
+  font-size: 1.8em;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.6em;
+  margin-top: 0.2em;
+  line-height: 1.2;
+  color: #212529;
+}
+
+.reveal h2 {
+  font-weight: 600;
+  font-size: 1.3em;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5em;
+  margin-top: 0.3em;
+  line-height: 1.3;
+  color: #0066cc;
+}
+
+.reveal h3 {
+  font-weight: 600;
+  font-size: 1.0em;
+  margin-bottom: 0.4em;
+  margin-top: 0.2em;
+  line-height: 1.4;
+  color: #212529;
+}
+
+.reveal p {
+  font-size: 0.9em;
+  line-height: 1.6;
+  margin-bottom: 0.5em;
+}
+
+.reveal li {
+  font-size: 0.9em;
+  line-height: 1.6;
+  margin-bottom: 0.25em;
+}
+
+.reveal ul, .reveal ol {
+  margin-bottom: 1em;
+  margin-top: 0.5em;
+}
+
+/* ============================================
+   Spacing System
+   ============================================ */
+.reveal .slides section {
+  padding: 1.5em 2em;
+  text-align: left;
+  font-size: 0.85em;
+}
+
+/* Title slide special styling */
+.reveal .title-slide {
+  text-align: center;
+}
+
+/* ============================================
+   Code Blocks - Minimal & Clean
+   ============================================ */
+.reveal pre {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1em;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.reveal code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  background-color: #f8f9fa;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.75em;
+  color: #495057;
+}
+
+.reveal pre code {
+  background: transparent;
+  padding: 0;
+  color: #212529;
+  font-size: 0.7em;
+}
+
+/* ============================================
+   Tables - Minimal Borders
+   ============================================ */
+.reveal table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+  font-size: 0.8em;
+}
+
+.reveal table th {
+  border-bottom: 2px solid #dee2e6;
+  padding: 0.5em 0.8em;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85em;
+  background-color: #f8f9fa;
+}
+
+.reveal table td {
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.4em 0.8em;
+}
+
+.reveal table tr:last-child td {
+  border-bottom: none;
+}
+
+.reveal table tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* ============================================
+   Minimal Color Palette
+   ============================================ */
+/* Single accent color for headings */
+.reveal h2 {
+  color: #0066cc;
+}
+
+/* Subtle emphasis */
+.reveal strong {
+  font-weight: 600;
+  color: #212529;
+}
+
+/* ============================================
+   Vertical Scrolling Support
+   ============================================ */
+.reveal .slides section {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100vh;
+  height: auto;
+  min-height: 100vh;
+}
+
+.reveal .slides section::-webkit-scrollbar {
+  width: 8px;
+}
+
+.reveal .slides section::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+.reveal .slides section::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 4px;
+}
+
+.reveal .slides section::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
