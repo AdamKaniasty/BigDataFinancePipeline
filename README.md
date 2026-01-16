@@ -1,14 +1,14 @@
 # Big Data Finance Project
 
-A comprehensive Big Data pipeline for ingesting, processing, and storing financial data including cryptocurrency prices and Polish National Bank (NBP) exchange rates.
+A comprehensive Big Data pipeline for ingesting, processing, and storing financial data including cryptocurrency trade events and Polish National Bank (NBP) exchange rates.
 
 ## Overview
 
 This project implements a data pipeline architecture that:
 - **Ingests** real-time cryptocurrency trade events from Binance WebSocket API (aggTrade)
 - **Ingests** daily exchange rates from the Polish National Bank (NBP) API
-- **Optionally buffers** the crypto stream through Kafka for resilience and decoupling
-- **Stores** raw data in HDFS with date/hour partitioning
+- **Buffers** the crypto stream through Kafka for resilience (recommended to meet the buffering requirement; a direct flow is also provided)
+- **Stores** raw data in HDFS with date/hour partitioning for crypto and date partitioning for NBP
 - **Processes** data using Apache Spark
 - **Queries** data using Apache Hive
 - **Serves** selected facts through Apache HBase for fast random reads
@@ -30,8 +30,8 @@ This project implements a data pipeline architecture that:
 ## Architecture
 
 ```
-Binance WS ──▶ NiFi ──▶ (Kafka optional) ──▶ HDFS ──▶ Spark/Hive ──▶ HBase
-NBP API   ─────────────────────────────────────────────▶ HDFS
+Binance WS ──▶ NiFi ──▶ Kafka ──▶ HDFS ──▶ Spark/Hive ──▶ HBase
+NBP API   ──▶ NiFi ────────────────────────────────────▶ HDFS
 ```
 
 ### Components
@@ -41,7 +41,7 @@ NBP API   ───────────────────────�
 - **Apache HDFS**: Distributed file system for data storage
 - **Apache Hive** (2.3.2 via `bde2020/hive`): SQL catalog over Parquet data in HDFS
 - **Apache Spark** (3.5.1): Data processing engine
-- **Apache HBase** (2.1.3 via `harisekhon/hbase`): Serving layer for fast random reads
+- **Apache HBase** (via `harisekhon/hbase`): Serving layer for fast random reads
 - **Zookeeper**: Coordination service for Kafka and HBase
 
 ## Prerequisites
@@ -77,7 +77,7 @@ This will start:
 - HDFS DataNode (port 9864)
 - Hive Metastore (port 9083)
 - HiveServer2 (port 10000)
-- Spark (interactive)
+- Spark (local driver container; jobs run via `spark-submit`)
 - NiFi (port 8080)
 
 ### 3. Wait for Services to Start
@@ -109,22 +109,22 @@ This creates the required directory structure:
 
 ## Data Flows
 
-### Crypto Price Flow
+### Crypto Trades Flow
 
 1. **Binance WebSocket** → Connects to Binance `aggTrade` stream (BTCUSDT)
 2. **ValidateRecord** → Validates incoming JSON records
 3. **UpdateRecord** → Transforms and enriches data
-4. **UpdateAttribute** → Adds partitioning attributes (date, hour, minute)
+4. **UpdateAttribute** → Adds partitioning attributes (date, hour, minute) and filename metadata
 5. **PublishKafkaRecord** → Publishes to Kafka topic `crypto-trades` (Kafka variant)
 6. **ConsumeKafkaRecord** → Consumes from Kafka (Kafka variant)
-7. **MergeRecord** → Merges records by minute
+7. **MergeRecord** → Merges records in a short time window (about one minute)
 8. **PutHDFS** → Writes to HDFS: `/data/finance/raw/crypto-trades/date={date}/hour={hour}/{day}-{hour}-{minute}.csv`
 
 The direct (no-Kafka) flow skips steps 5–6 and writes to HDFS after `MergeRecord`.
 
 **Flow Files:**
 - `nifi/backups/crypto-flow.json` - Direct flow (no Kafka)
-- `nifi/backups/crypto-flow-kafka-4.json` - Flow with Kafka buffer
+- `nifi/backups/crypto-flow-kafka-4.json` - Flow with Kafka buffer (recommended for requirements)
 
 ### NBP Exchange Rates Flow
 
@@ -159,7 +159,7 @@ The flows can be loaded programmatically using the NiFi REST API. See individual
 Stored in: `/data/finance/raw/crypto-trades/date={YYYY-MM-DD}/hour={HH}/{day}-{hour}-{minute}.csv`
 
 **Columns:**
-The raw CSV preserves the Binance `aggTrade` payload (e.g., `e`, `E`, `s`, `a`, `p`, `q`, `T`) and additional fields produced by NiFi. The ETL uses the following key fields:
+The raw CSV contains a normalized record used by ETL. The key fields are:
 - `symbol` - Trading pair (`BTCUSDT`)
 - `price` - Trade price
 - `quantity` - Trade quantity (base asset)
@@ -221,7 +221,7 @@ Individual tests:
 docker compose -f docker-compose.yml exec hdfs-namenode hdfs dfs -ls -R /data/finance/raw
 # (or: docker compose -f docker-compose-arm.yml exec hdfs-namenode hdfs dfs -ls -R /data/finance/raw)
 
-# Read crypto prices
+# Read crypto trades
 ./hdfs/read-crypto-trades.sh 2026-01-05 12
 
 # Read NBP rates
@@ -359,8 +359,6 @@ BigDataProject/
 │   ├── create-directories.sh # HDFS directory setup
 │   ├── read-*.sh             # Data reading scripts
 │   └── clear-*.sh            # Data cleanup scripts
-├── kafka/
-│   └── test-kafka.sh         # Kafka testing
 ├── tests/
 │   └── service/              # Service test scripts
 ├── raport/                   # Project report (LaTeX)
@@ -392,3 +390,9 @@ BigDataProject/
 - Hive is used as the external schema/catalog over curated and analytics Parquet tables and for light `SELECT ... LIMIT` queries.
 - Hive runs in local MapReduce mode in this stack; larger scans like `SELECT COUNT(*)` can be slow, so heavier analytics are handled in Spark.
 - All non-trivial computation and validation (ETL, analytics, sanity checks) are done in Spark using `spark-submit`.
+
+## License
+Copyright (c) 2026 Igor Kołodziej and Adam Kaniasty.
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file for details.
+
