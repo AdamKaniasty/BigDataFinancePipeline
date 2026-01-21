@@ -959,6 +959,65 @@ stored in HBase in the expected form. This test is the primary evidence
 of system correctness and can be used as the key demonstration during
 project presentation.
 
+\section{Team contributions}
+
+The project was delivered by a two-person team: Igor Ko{\l}odziej and
+Adam Kaniasty. Responsibilities were clearly defined, and both members
+collaborated on architecture design, planning, and end-to-end testing.
+
+\textbf{Igor Ko{\l}odziej} -- processing, analytics, and serving layer:
+\begin{itemize}
+\item
+  design and implementation of Spark ETL jobs for the curated layer
+  (\path{spark/etl_nbp.py}, \path{spark/etl_crypto.py}) and the
+  \path{spark/run-etl.sh} wrapper,
+\item
+  design and implementation of the analytics layer
+  (\path{spark/analytics_fx_crypto.py}), sanity checks
+  (\path{spark/check_analytics_sanity.py}), and scripts
+  \path{spark/run-analytics.sh}, \path{spark/run-check-analytics.sh},
+\item
+  Hive schema design and preparation of scripts
+  \path{hive/init_tables.sql}, \path{hive/init_views.sql},
+  \path{hive/init-tables.sh}, \path{hive/init-views.sh},
+\item
+  design and implementation of the HBase layer
+  (\path{hbase/init-hbase.sh}, \path{spark/load_hbase_facts.py},
+  \path{hbase/load-facts.sh}) and integration with analytical views,
+\item
+  preparation and co-editing of technical documentation and the report
+  (\path{raport/raport.tex}), especially the Spark/Hive/HBase sections.
+\end{itemize}
+
+\textbf{Adam Kaniasty} -- infrastructure and ingest layer:
+\begin{itemize}
+\item
+  containerized environment setup via Docker/Docker Compose
+  (\texttt{docker-compose.yml}) with HDFS, Hive, Spark, NiFi, Kafka, and
+  HBase services,
+\item
+  HDFS configuration and scripted management
+  (\path{hdfs/create-directories.sh}, \texttt{read-*}, \texttt{clear-*})
+  and service tests under \path{tests/service/} (including Kafka and HDFS
+  tests),
+\item
+  preparation and configuration of NiFi flows for Binance and NBP
+  (files in \path{nifi/backups/}, integration with
+  \path{nifi/core-site.xml}),
+\item
+  Kafka configuration and testing of flow variants with/without Kafka
+  buffering,
+\item
+  initial project documentation (\texttt{README.md}) and support for
+  integration testing across layers (NiFi/Kafka \textrightarrow{} HDFS
+  \textrightarrow{} Spark).
+\end{itemize}
+
+Together, the team designed the target system architecture, agreed on
+data schemas and layer partitioning (raw/curated/aggregated/serving),
+prepared the project plan, and ran full end-to-end tests of the
+pipeline (\path{tests/service/test-full-pipeline.sh}).
+
 \section{Summary of the final solution}
 
 In summary, the project delivered a complete, multi-layer Big Data
