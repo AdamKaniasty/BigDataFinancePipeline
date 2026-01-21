@@ -395,8 +395,8 @@ BigDataProject/
 
 Built as a two-person project by **Igor Kołodziej** and **Adam Kaniasty**.
 
-- **Igor Kołodziej**: Spark ETL & analytics, Hive tables/views, HBase facts serving
-- **Adam Kaniasty**: Docker/Compose infrastructure, NiFi ingestion flows, Kafka buffering, HDFS tooling & tests
+- [Igor Kołodziej](https://github.com/IgorKolodziej): Spark ETL & analytics, Hive tables/views, HBase facts serving
+- [Adam Kaniasty](https://github.com/AdamKaniasty): Docker/Compose infrastructure, NiFi ingestion flows, Kafka buffering, HDFS tooling & tests
 
 Both contributors collaborated on architecture design, integration, and end-to-end validation.
 
