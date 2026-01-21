@@ -391,6 +391,15 @@ BigDataProject/
 - Hive runs in local MapReduce mode in this stack; larger scans like `SELECT COUNT(*)` can be slow, so heavier analytics are handled in Spark.
 - All non-trivial computation and validation (ETL, analytics, sanity checks) are done in Spark using `spark-submit`.
 
+## Contributors
+
+Built as a two-person project by **Igor Kołodziej** and **Adam Kaniasty**.
+
+- **Igor Kołodziej**: Spark ETL & analytics, Hive tables/views, HBase facts serving
+- **Adam Kaniasty**: Docker/Compose infrastructure, NiFi ingestion flows, Kafka buffering, HDFS tooling & tests
+
+Both contributors collaborated on architecture design, integration, and end-to-end validation.
+
 ## License
 Copyright (c) 2026 Igor Kołodziej and Adam Kaniasty.
 
